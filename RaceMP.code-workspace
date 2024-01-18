@@ -1,0 +1,12 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "terminal.integrated.env.windows": {
+            "PATH": "C:\\Program Files\\7-Zip"
+        },
+    }
+}

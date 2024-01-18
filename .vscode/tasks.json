@@ -1,0 +1,40 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compress client",
+            "type": "shell",
+            "command": "zip -r ../../export/Resources/Client/RaceMP.zip art levels lua scripts LICENSE",
+            "windows": {
+                "command": "7z a -tzip ../../export/Resources/Client/RaceMP.zip art levels lua scripts LICENSE -aoa -r"
+            },
+            "options": {
+                "cwd": "Resources/Client"
+            }
+        },
+        {
+            "label": "Copy server",
+            "type": "shell",
+            "command": "cp 'RaceMP.lua' '../../../export/Resources/Server/RaceMP/RaceMP.lua'",
+            "windows": {
+                "command": "Copy-Item 'RaceMP.lua' '..\\..\\..\\export\\Resources\\Server\\RaceMP\\RaceMP.lua'"
+            },
+            "options": {
+                "cwd": "Resources/Server/RaceMP"
+            }
+        },
+        {
+            "label": "Compress Release",
+            "type": "shell",
+            "command": "zip -r ../RaceMP.zip Resources",
+            "windows": {
+                "command": "7z a -tzip ../RaceMP.zip Resources -aoa -r"
+            },
+            "options": {
+                "cwd": "export"
+            }
+        }
+    ]
+}
