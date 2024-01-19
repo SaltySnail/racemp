@@ -120,7 +120,7 @@ function addCurrentPostition(pTable)
     for position, t in pairs(location) do
         pTable[t['player']]['position'] = position
         if position > maxPosition then
-            maxPosition
+            maxPosition = position
         end
     end
 
