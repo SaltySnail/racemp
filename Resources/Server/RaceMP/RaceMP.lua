@@ -8,6 +8,8 @@ local settings = {}
 ]]
 
 local players = {}
+local explodeWait = 30
+local explodeTime = explodeWait
 
 local function prettyTime(seconds)
     local thousandths = seconds * 1000
@@ -114,8 +116,19 @@ function addCurrentPostition(pTable)
     local function sortTotal(k1,k2) return k1.total > k2.total end
     table.sort(location, sortTotal)
 
+    local maxPosition = 0
     for position, t in pairs(location) do
         pTable[t['player']]['position'] = position
+        if position > maxPosition then
+            maxPosition
+        end
+    end
+
+    for position, t in pairs(location) do
+        if timer > explodeTime and position == maxPosition then
+            explodeTime = timer + explodeWait
+            MP.TriggerClientEvent(player, "explodeRaceMPCar", players[player].vehID)
+        end
     end
 
     print(Util.JsonEncode(pTable))
@@ -242,6 +255,10 @@ function clientRaceMPLoaded(player)
     players[player] = {['name'] = MP.GetPlayerName(player), ['splits'] = 0}
 end
 
+function setVehicleID(player, vehID)
+	players[player].vehID = vehID
+end
+
 print("RaceMP loaded")
 
 
@@ -253,3 +270,4 @@ MP.RegisterEvent("setTrack", "setTrack")
 MP.RegisterEvent("clientRaceMPReady", "clientRaceMPReady")
 MP.RegisterEvent("onPlayerJoin", "clientRaceMPLoaded")
 MP.RegisterEvent("onLapSplit", "onLapSplit")
+MP.RegisterEvent("setVehicleID", "setVehicleID")

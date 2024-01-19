@@ -50,7 +50,7 @@ local function configRace(data)
         prefabPath   = "levels/" .. core_levels.getLevelName(getMissionFilename()) .. "/multiplayer/" .. data["track"] .. ".prefab.json"
         prefabName   = string.gsub(prefabPath, "(.*/)(.*)", "%2"):sub(1, -13)
         prefabObj    = spawnPrefab(prefabName, prefabPath, '0 0 0', '0 0 1', '1 1 1')
-
+        be:reloadStaticCollision(true)
         checkpointCount = 0
         for _,name in pairs(scenetree.findClassObjects('BeamNGTrigger')) do
             if string.find(name,"lapSplit") then checkpointCount = checkpointCount + 1 end
@@ -98,6 +98,7 @@ local function onLapStart()
         local data = jsonEncode( { ["startStop"] = checkpointTimes.startStop, ["startTimeStamp"] = checkpointTimes.startTimeStamp } )
         log('D', logTag, data)
         TriggerServerEvent("onLapStart", data)
+        TriggerServerEvent("setVehicleID", be:getPlayerVehicleID(0))
     end
 end
 
@@ -118,8 +119,8 @@ local function onLapSplit(triggerName)
 end
 
 -- Function to explode a car by its vehicle ID
-function explodeSumoCar(vehID)
-    -- log('D', logTag, "explodeSumoCar called " .. dump(vehID))
+function explodeRaceMPCar(vehID)
+    -- log('D', logTag, "explodeRaceMPCar called " .. dump(vehID))
     -- local veh = be:getObjectByID(vehID)
     -- if vehID and MPVehicleGE.getVehicleByGameID(vehID) then
     --     local ownerName = MPVehicleGE.getVehicleByGameID(vehID).ownerName
@@ -138,10 +139,10 @@ function explodeSumoCar(vehID)
             veh:queueLuaCommand("fire.explodeVehicle()")
             veh:queueLuaCommand("fire.igniteVehicle()")
             veh:queueLuaCommand("beamstate.breakAllBreakgroups()")
-            disallowSumoResets()
+            -- disallowSumoResets()
         end
     end
-    resetCarColors()
+    -- resetCarColors()
 end
 
 local function onLapStop()
@@ -167,7 +168,7 @@ local function onLapStop()
         TriggerServerEvent("onLapStop", data)
         penalty = 0
         timer = 0 
-        explodeSumoCar(be:getPlayerVehicleID(0))
+        -- explodeRaceMPCar(be:getPlayerVehicleID(0))
     end
 end
 
@@ -179,12 +180,12 @@ local function onLapOutOfBounds()
 end
 
 local function onVehicleResetted(gameVehicleID)
-    if MPVehicleGE.isOwn(gameVehicleID) then
-        if lapActive then
-            guihooks.trigger('toastrMsg', {type="error", title = "Time Forfeit!", msg = "You may continue but checkpoints are not active for this lap!", config = {timeOut = 2500 }})
-            lapActive = false
-        end
-    end
+    -- if MPVehicleGE.isOwn(gameVehicleID) then
+    --     if lapActive then
+    --         guihooks.trigger('toastrMsg', {type="error", title = "Time Forfeit!", msg = "You may continue but checkpoints are not active for this lap!", config = {timeOut = 2500 }})
+    --         lapActive = false
+    --     end
+    -- end
 end
 
 local function onPit(data)
@@ -262,7 +263,7 @@ local function onUpdate(dt)
 end
 
 AddEventHandler("RaceMPMessage", messageReceived)
-AddEventHandler("explodeSumocar",explodeSumoCar)
+AddEventHandler("explodeRaceMPCar",explodeRaceMPCar)
 AddEventHandler("ConfigRace", configRace)
 AddEventHandler("ListRaces", listRaces)
 
@@ -272,7 +273,7 @@ M.onUpdate = onUpdate
 M.onWorldReadyState = onWorldReadyState
 M.onExtensionLoaded = onExtensionLoaded
 M.onExtensionUnloaded = onExtensionUnloaded
-M.explodeSumoCar = explodeSumoCar
+M.explodeRaceMPCar = explodeRaceMPCar
 M.onBeamNGTrigger = onBeamNGTrigger
 
 return M
