@@ -121,12 +121,12 @@ end
 function explodeSumoCar(vehID)
     -- log('D', logTag, "explodeSumoCar called " .. dump(vehID))
     -- local veh = be:getObjectByID(vehID)
-    if vehID and MPVehicleGE.getVehicleByGameID(vehID) then
-        local ownerName = MPVehicleGE.getVehicleByGameID(vehID).ownerName
-        if gamestate.players[ownerName] then
-            gamestate.players[ownerName].dead = true
-        end
-    end
+    -- if vehID and MPVehicleGE.getVehicleByGameID(vehID) then
+    --     local ownerName = MPVehicleGE.getVehicleByGameID(vehID).ownerName
+    --     if gamestate.players[ownerName] then
+    --         gamestate.players[ownerName].dead = true
+    --     end
+    -- end
     for vid, veh in activeVehiclesIterator() do
     -- for k,veh in pairs(MPVehicleGE.getVehicles()) do
     -- log('D', logtag, "Seeing if a car should explode.")
@@ -262,7 +262,7 @@ local function onUpdate(dt)
 end
 
 AddEventHandler("RaceMPMessage", messageReceived)
-AddEventHandler("explodesumocar",explodeSumoCar)
+AddEventHandler("explodeSumocar",explodeSumoCar)
 AddEventHandler("ConfigRace", configRace)
 AddEventHandler("ListRaces", listRaces)
 
