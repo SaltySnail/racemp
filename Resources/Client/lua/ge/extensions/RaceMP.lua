@@ -117,6 +117,33 @@ local function onLapSplit(triggerName)
     end
 end
 
+-- Function to explode a car by its vehicle ID
+function explodeSumoCar(vehID)
+    -- log('D', logTag, "explodeSumoCar called " .. dump(vehID))
+    -- local veh = be:getObjectByID(vehID)
+    if vehID and MPVehicleGE.getVehicleByGameID(vehID) then
+        local ownerName = MPVehicleGE.getVehicleByGameID(vehID).ownerName
+        if gamestate.players[ownerName] then
+            gamestate.players[ownerName].dead = true
+        end
+    end
+    for vid, veh in activeVehiclesIterator() do
+    -- for k,veh in pairs(MPVehicleGE.getVehicles()) do
+    -- log('D', logtag, "Seeing if a car should explode.")
+    -- log('D', logtag, "Seeing if car with the following ID should explode: " .. vid)
+    -- log('D', logtag, "vid: " .. vid .. " vehID: " .. tonumber(vehID))
+        if vid == tonumber(vehID) then
+        -- local vehicle = scenetree.findObjectById(veh.ID)
+        -- log('D', logtag, "BOOM goes the dynamite!")
+            veh:queueLuaCommand("fire.explodeVehicle()")
+            veh:queueLuaCommand("fire.igniteVehicle()")
+            veh:queueLuaCommand("beamstate.breakAllBreakgroups()")
+            disallowSumoResets()
+        end
+    end
+    resetCarColors()
+end
+
 local function onLapStop()
     if not lapActive then
         verifySplits = {}
@@ -127,7 +154,7 @@ local function onLapStop()
             guihooks.trigger('toastrMsg', {type="error", title = "Lap Incomplete!", msg = "You must pass through all checkpoints to log an official time!", config = {timeOut = 2500 }})
             penalty = penalty + 1
         end
-        stopTime = timer
+        stopTime = timer 
         lapTime = stopTime - lapStart
         checkpointTimes.startStop = lapTime
         checkpointTimes.stopTimeStamp = os.time()
@@ -139,7 +166,8 @@ local function onLapStop()
         log('D', logTag, data)
         TriggerServerEvent("onLapStop", data)
         penalty = 0
-        timer = 0
+        timer = 0 
+        explodeSumoCar(be:getPlayerVehicleID(0))
     end
 end
 
@@ -234,7 +262,7 @@ local function onUpdate(dt)
 end
 
 AddEventHandler("RaceMPMessage", messageReceived)
-
+AddEventHandler("explodesumocar",explodeSumoCar)
 AddEventHandler("ConfigRace", configRace)
 AddEventHandler("ListRaces", listRaces)
 
@@ -244,7 +272,7 @@ M.onUpdate = onUpdate
 M.onWorldReadyState = onWorldReadyState
 M.onExtensionLoaded = onExtensionLoaded
 M.onExtensionUnloaded = onExtensionUnloaded
-
+M.explodeSumoCar = explodeSumoCar
 M.onBeamNGTrigger = onBeamNGTrigger
 
 return M
