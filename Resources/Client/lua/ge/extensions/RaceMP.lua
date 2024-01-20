@@ -13,6 +13,8 @@ local lapTime
 local currentSplits = {}
 local checkpointTimes = {}
 local verifySplits = {}
+local explodeWait = 30
+local explodeTime = explodeWait
 
 local prefabActive = false
 local prefabPath
@@ -259,6 +261,10 @@ end
 
 local function onUpdate(dt)
     timer = timer + dt
+    if lapActive and timer > explodeTime then
+        explodeTime = timer + explodeWait
+        TriggerServerEvent("explodeLastPlayer", "nil")
+    end
     core_environment.setGravity(-9.81)
 end
 

@@ -8,8 +8,6 @@ local settings = {}
 ]]
 
 local players = {}
-local explodeWait = 30
-local explodeTime = explodeWait
 
 local function prettyTime(seconds)
     local thousandths = seconds * 1000
@@ -82,6 +80,7 @@ function addCurrentPostition(pTable)
     --print(Util.JsonEncode(pTable))
     for id,player in pairs(pTable) do
         local total = player['splits']
+        local position = player['position']
         local lastLap   = #player
         local lastSplit = tableLength(player[lastLap])
         local dec = 0
@@ -116,20 +115,22 @@ function addCurrentPostition(pTable)
     local function sortTotal(k1,k2) return k1.total > k2.total end
     table.sort(location, sortTotal)
 
-    local maxPosition = 0
+    -- local maxPosition = 0
     for position, t in pairs(location) do
         pTable[t['player']]['position'] = position
-        if position > maxPosition then
-            maxPosition = position
-        end
+        -- if position > maxPosition then
+        --     maxPosition = position
+        -- end
     end
 
-    for position, t in pairs(location) do
-        if timer > explodeTime and position == maxPosition then
-            explodeTime = timer + explodeWait
-            MP.TriggerClientEvent(player, "explodeRaceMPCar", players[player].vehID)
-        end
-    end
+    -- for position, t in pairs(location) do
+    --     print(dump(pTable[t['player']]))
+    --     if pTable[t['player']]["lapSplit"] and  pTable[t['player']]["lapSplit"] > explodeTime and position == maxPosition then
+    --         print("" .. pTable[t['player']]["lapSplit"] .. " > " .. explodeTime .. " " .. position .. "==" .. maxPosition)
+    --         explodeTime = pTable[t['player']]["lapSplit"] + explodeWait
+    --         MP.TriggerClientEvent(player, "explodeRaceMPCar", players[player].vehID)
+    --     end
+    -- end
 
     print(Util.JsonEncode(pTable))
     return pTable
@@ -259,6 +260,21 @@ function setVehicleID(player, vehID)
 	players[player].vehID = vehID
 end
 
+function explodeLastPlayer()
+    -- print(dump(players))
+    local maxPosition = 0
+    for player, laps in pairs(players) do
+        if players[player].position and players[player].position > maxPosition then
+            maxPosition = players[player].position
+        end
+    end
+    for player, laps in pairs(players) do
+        if players[player].position and players[player].position == maxPosition then
+            MP.TriggerClientEvent(-1, "explodeRaceMPCar", players[player].vehID)
+        end
+    end
+end
+
 print("RaceMP loaded")
 
 
@@ -271,3 +287,6 @@ MP.RegisterEvent("clientRaceMPReady", "clientRaceMPReady")
 MP.RegisterEvent("onPlayerJoin", "clientRaceMPLoaded")
 MP.RegisterEvent("onLapSplit", "onLapSplit")
 MP.RegisterEvent("setVehicleID", "setVehicleID")
+MP.RegisterEvent("explodeLastPlayer", "explodeLastPlayer")
+
+
