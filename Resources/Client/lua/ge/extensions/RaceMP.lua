@@ -13,6 +13,7 @@ local lapTime
 local currentSplits = {}
 local checkpointTimes = {}
 local verifySplits = {}
+local deathRace = false
 local explodeWait = 30
 local explodeTime = explodeWait
 
@@ -92,6 +93,7 @@ local function onLapStart()
         penalty = 0
         timer = 0
         startTime = timer
+        explodeTime = explodeWait --this needs to be run once so it needs a better spot.
         lapStart = timer
         currentSplits = {}
         checkpointTimes.startStop = lapStart
@@ -272,6 +274,7 @@ AddEventHandler("RaceMPMessage", messageReceived)
 AddEventHandler("explodeRaceMPCar",explodeRaceMPCar)
 AddEventHandler("ConfigRace", configRace)
 AddEventHandler("ListRaces", listRaces)
+AddEventHandler("onLapStop", onLapStop)
 
 M.onVehicleResetted = onVehicleResetted
 
@@ -281,5 +284,6 @@ M.onExtensionLoaded = onExtensionLoaded
 M.onExtensionUnloaded = onExtensionUnloaded
 M.explodeRaceMPCar = explodeRaceMPCar
 M.onBeamNGTrigger = onBeamNGTrigger
+M.onLapStop = onLapStop
 
 return M

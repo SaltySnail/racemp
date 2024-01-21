@@ -115,22 +115,9 @@ function addCurrentPostition(pTable)
     local function sortTotal(k1,k2) return k1.total > k2.total end
     table.sort(location, sortTotal)
 
-    -- local maxPosition = 0
     for position, t in pairs(location) do
         pTable[t['player']]['position'] = position
-        -- if position > maxPosition then
-        --     maxPosition = position
-        -- end
     end
-
-    -- for position, t in pairs(location) do
-    --     print(dump(pTable[t['player']]))
-    --     if pTable[t['player']]["lapSplit"] and  pTable[t['player']]["lapSplit"] > explodeTime and position == maxPosition then
-    --         print("" .. pTable[t['player']]["lapSplit"] .. " > " .. explodeTime .. " " .. position .. "==" .. maxPosition)
-    --         explodeTime = pTable[t['player']]["lapSplit"] + explodeWait
-    --         MP.TriggerClientEvent(player, "explodeRaceMPCar", players[player].vehID)
-    --     end
-    -- end
 
     print(Util.JsonEncode(pTable))
     return pTable
@@ -200,6 +187,7 @@ function onChatMessage(senderID, name, message)
         settings["lapCount"] = tonumber(args["laps"])
         settings["track"]    = args["track"]
         settings["raceName"] = args["raceName"]
+        settings["explosions"] = args["explosions"] == "true"
 
         local send = Util.JsonEncode( settings )
         --print(send)
@@ -261,7 +249,8 @@ function setVehicleID(player, vehID)
 end
 
 function explodeLastPlayer()
-    -- print(dump(players))
+    -- print(dump(settings))
+    if not settings["explosions"] then return end
     local maxPosition = 0
     for player, laps in pairs(players) do
         if players[player].position and players[player].position > maxPosition then
@@ -271,12 +260,12 @@ function explodeLastPlayer()
     for player, laps in pairs(players) do
         if players[player].position and players[player].position == maxPosition then
             MP.TriggerClientEvent(-1, "explodeRaceMPCar", players[player].vehID)
+            MP.TriggerClientEvent(player, "onLapStop", "nil")
         end
     end
 end
 
 print("RaceMP loaded")
-
 
 MP.RegisterEvent("onLapStart", "lapStart")
 MP.RegisterEvent("onLapStop", "lapStop")
